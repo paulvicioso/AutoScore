@@ -1,0 +1,42 @@
+
+/* Row hover color */
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: lightblue;
+}
+
+.header {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.table-header {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.table-footer {
+    border-bottom: 1px solid #e5e5e5;
+}
+/* Classes */
+
+.btn-table {
+    width: 25%;
+}
+
+@media screen and (min-width: 768px) {
+    #myModal .modal-dialog {
+        width: 900px;
+    }
+}
+
+#myModal .modal-dialog {
+    width: 75%;
+}
+
+td.highlight {
+    font-weight: bold;
+    background: lightyellow;
+    color: black;
+}
+
+.btn-space {
+    margin-bottom: 5px;
+}

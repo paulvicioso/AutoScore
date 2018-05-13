@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE = edge">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+        crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/narrow-style.css">
+    <link rel="stylesheet" href="../css/column-height.css">
+
+    <script type="text/javascript" src="../js/bootstrap/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap/popper.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap/bootstrap.min.js"></script>
+
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+
+    <script type="text/javascript" src="../js/jszip.min.js"></script>
+    <script type="text/javascript" src="../js/FileSaver.js"></script>
+    <script type="text/javascript" src="../js/global.js"></script>
+    <script type="text/javascript" src="../js/scorer.js"></script>
+    <script type="text/javascript" src="../js/main.js"></script>
+
+    <title>AutoScore</title>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h2 class="text-muted">AutoScore</h2>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="row">
+            <label class="btn btn-default btn-space btn-block" data-toggle="tooltip" data-placement="right" title="Upload CSV file with the Targets/Variants list">
+                <span class="glyphicon glyphicon-open-file pull-left">
+                    <input id="targets_fileinput" type="file" style="display: none;">
+                </span>Upload Targets/Variants List
+            </label>
+        </div>
+        <div class="row">
+            <label class="btn btn-default btn-space btn-block" data-toggle="tooltip" data-placement="right" title="Upload study CSV file (or list of files)">
+                <span class="glyphicon glyphicon-folder-open pull-left">
+                    <input id="study_fileinput" type="file" style="display: none;" multiple>
+                </span>Upload Input Response File(s)
+            </label>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="row">
+            <div class="col-md-6">
+                <button id="calc_score" class="btn btn-default btn-block" data-toggle="tooltip" data-placement="right" title="Generate the score for each entry of the current file">
+                    <span class="glyphicon glyphicon-flash pull-left"></span>Calculate Score
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-default btn-block" onclick='downloadCSV({});' data-toggle="tooltip" data-placement="right" title="Download the current study file">
+                    <span class="glyphicon glyphicon-download-alt pull-left"></span>Download Scored CSV File
+                </button>
+            </div>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="row">
+            <div class="col-md-12">
+                <table id="myTable" class="stripe row-border hover">
+                    <thead id="table_header">
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="well" hidden>
+            <form class="form-horizontal">
+                <fieldset>
+
+                    <legend>Data from row</legend>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Index</label>
+                        <div class="col-md-4">
+                            <label id="index" class="form-control"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Target</label>
+                        <div class="col-md-8">
+                            <label id="target" class="form-control"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Response</label>
+                        <div class="col-md-8">
+                            <label id="response" class="form-control"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Matched</label>
+                        <div class="col-md-8">
+                            <label id="matched" class="form-control"></label>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button id="close_modal" type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">AutoScore</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label id="mod_index"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="row-height">
+                                <div class="col-xs-8 col-height">
+                                </div>
+                                <div class="col-xs-2 col-height score-header">
+                                    <label id="human_label">Human Score</label>
+                                </div>
+                                <div class="col-xs-2 col-height score-header robot">
+                                    <label id="robot_label">Robot Score</label>
+                                </div>
+                            </div>
+                            <div class="row-height">
+                                <div class="col-xs-8 col-height">
+                                    <div class="inside">
+                                        <div id="mod_target" class="alert alert-info target">
+                                        </div>
+                                        <div id="mod_response" class="alert alert-warning response">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-height col-middle rounded">
+                                    <div class="inside">
+                                        <h1 id="mod_human" class="display-1">4</h1>
+                                    </div>
+                                </div>
+                                <div class="col-xs-2 col-height col-middle rounded robot">
+                                    <div class="inside">
+                                        <h1 id="mod_robot" class="display-1">0</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!--<button id="dismiss_modal" type="button" class="btn btn-default">Close</button>-->
+                        <button id="save_changes" type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+        <div id="safari_download" class="modal fade">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">AutoScore</h4>
+                    </div>
+                    <div class="modal-body">
+                        <a id="download_link" href="#"></a>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+    </div>
+    <!--/container-->
+</body>
+
+</html>
